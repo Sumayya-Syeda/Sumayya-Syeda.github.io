@@ -1,0 +1,69 @@
+---
+import { categoryColors, type Project } from '../data/projects';
+
+interface Props {
+  project: Project;
+}
+
+const { project } = Astro.props;
+const colors = categoryColors[project.category];
+const heroPhoto = project.photos?.[0];
+---
+
+<a
+  href={`/projects/${project.slug}`}
+  class="group block rounded-xl overflow-hidden border border-paper-line hover:shadow-md hover:-translate-y-0.5 transition-all reveal no-underline text-ink"
+>
+  {heroPhoto ? (
+    <div class="aspect-[16/10] max-w-sm mx-auto overflow-hidden bg-paper-warm">
+      <img
+        src={heroPhoto.src}
+        alt={heroPhoto.alt}
+        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+        loading="lazy"
+      />
+    </div>
+  ) : (
+    <div
+      class="aspect-[16/10] max-w-sm mx-auto flex items-center justify-center"
+      style={`background: ${colors.pastel};`}
+      aria-hidden="true"
+    >
+      <span
+        class="font-mono text-xs uppercase tracking-widest"
+        style={`color: ${colors.strong};`}
+      >
+        Photos coming soon
+      </span>
+    </div>
+  )}
+
+  <div
+    class="p-6 sm:p-7 border-t border-paper-line"
+    style={`background: linear-gradient(135deg, ${colors.pastel}55 0%, transparent 60%);`}
+  >
+    <div class="flex items-baseline justify-between gap-3 mb-3">
+      <span
+        class="font-mono text-[10px] uppercase tracking-widest px-2 py-0.5 rounded"
+        style={`background: ${colors.pastel}; color: ${colors.strong};`}
+      >
+        {project.category}
+      </span>
+      <p class="font-mono text-[11px] text-ink-faint whitespace-nowrap">{project.period}</p>
+    </div>
+
+    <h3 class="font-serif text-2xl sm:text-3xl text-ink mb-1 leading-tight group-hover:text-accent transition-colors">
+      {project.title}
+    </h3>
+    <p class="text-xs text-ink-muted mb-4">{project.context}</p>
+
+    <p class="text-sm text-ink/90 leading-relaxed mb-5">{project.summary}</p>
+
+    <span
+      class="font-mono text-[11px] uppercase tracking-widest inline-flex items-center gap-1 transition-transform group-hover:translate-x-0.5"
+      style={`color: ${colors.strong};`}
+    >
+      Read more <span aria-hidden="true">→</span>
+    </span>
+  </div>
+</a>

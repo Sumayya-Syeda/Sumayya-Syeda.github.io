@@ -1,0 +1,92 @@
+---
+interface OutlineItem {
+  id: string;
+  label: string;
+}
+
+interface Props {
+  items: OutlineItem[];
+  title?: string;
+}
+
+const { items, title = 'On this page' } = Astro.props;
+---
+
+<aside
+  class="page-outline hidden lg:block fixed top-28 right-6 xl:right-10 z-30 w-[180px]"
+  aria-label="Page outline"
+>
+  <p class="font-mono text-[10px] uppercase tracking-widest text-ink-faint mb-3 pl-4">
+    {title}
+  </p>
+  <ul>
+    {items.map((item) => (
+      <li>
+        <a
+          href={`#${item.id}`}
+          data-target={item.id}
+          class="outline-link block text-sm py-1.5 pl-4 -ml-px border-l-2 border-paper-line text-ink-muted hover:text-ink no-underline transition-colors"
+        >
+          {item.label}
+        </a>
+      </li>
+    ))}
+  </ul>
+</aside>
+
+<style>
+  .outline-link.is-active {
+    color: #3b6e8f;
+    border-left-color: #3b6e8f;
+    font-weight: 600;
+  }
+</style>
+
+<script is:inline>
+  const initOutline = () => {
+    const links = Array.from(document.querySelectorAll('.outline-link'));
+    if (links.length === 0) return;
+
+    const sections = links
+      .map((link) => {
+        const id = link.getAttribute('data-target');
+        return { id, link, el: id ? document.getElementById(id) : null };
+      })
+      .filter((s) => s.el);
+
+    if (sections.length === 0) return;
+
+    const setActive = (id) => {
+      links.forEach((l) => {
+        l.classList.toggle('is-active', l.getAttribute('data-target') === id);
+      });
+    };
+
+    // Pick the section whose top has scrolled past a target line about
+    // 25% down from the top of the viewport. The most-recently-passed
+    // section wins.
+    const update = () => {
+      const targetY = window.innerHeight * 0.25;
+      let best = sections[0];
+      let bestTop = -Infinity;
+      for (const s of sections) {
+        const top = s.el.getBoundingClientRect().top;
+        if (top <= targetY && top > bestTop) {
+          best = s;
+          bestTop = top;
+        }
+      }
+      setActive(best.id);
+    };
+
+    update();
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update, { passive: true });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initOutline);
+  } else {
+    initOutline();
+  }
+</script>

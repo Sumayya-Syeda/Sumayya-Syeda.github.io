@@ -1,0 +1,87 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ExperienceCard from '../components/ExperienceCard.astro';
+import TeachingCard from '../components/TeachingCard.astro';
+import CommunityCard from '../components/CommunityCard.astro';
+import PageOutline from '../components/PageOutline.astro';
+import { roadmap } from '../data/roadmap';
+import { teaching } from '../data/teaching';
+import { community } from '../data/community';
+
+const latestStop = roadmap[roadmap.length - 1];
+// CMU is shown on the home-page road map; skip duplicating it as a Work card.
+const work = [...roadmap].filter((s) => s.slug !== 'cmu').reverse();
+
+const outlineItems = [
+  { id: 'work', label: 'Work' },
+  { id: 'teaching', label: 'Teaching Experience' },
+  { id: 'community', label: 'Community' },
+];
+---
+
+<Layout
+  title="Experience — Sumayya Syeda"
+  description="Work, teaching, and community involvement."
+>
+  <PageOutline items={outlineItems} />
+
+  <div class="lg:pl-20 lg:pr-56 xl:pl-28 xl:pr-60">
+    <section class="max-w-page mx-auto px-6 pt-16 sm:pt-20 pb-10">
+      <p class="font-mono text-xs uppercase tracking-widest text-ink-faint mb-3">
+        Experience
+      </p>
+      <h1 class="font-serif text-4xl sm:text-5xl text-ink mb-5 leading-tight">
+        Where I've been, in and out of work
+      </h1>
+      <p class="text-lg text-ink/90 leading-relaxed max-w-prose">
+        Work, teaching, and community involvement through college and after.
+        Click any card for the longer story.
+      </p>
+    </section>
+
+    <section id="work" class="max-w-3xl mx-auto px-6 pb-16 scroll-mt-24">
+      <header class="mb-6 flex items-baseline gap-4">
+        <h2 class="font-serif text-2xl sm:text-3xl text-ink">Work</h2>
+        <span class="font-mono text-xs text-ink-faint">{work.length} roles</span>
+        <span class="flex-1 border-t border-dashed border-paper-line" aria-hidden="true"></span>
+      </header>
+      <ul class="flex flex-col gap-5">
+        {work.map((stop) => (
+          <li>
+            <ExperienceCard stop={stop} isLatest={stop === latestStop} />
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section id="teaching" class="max-w-3xl mx-auto px-6 pb-16 scroll-mt-24">
+      <header class="mb-6 flex items-baseline gap-4">
+        <h2 class="font-serif text-2xl sm:text-3xl text-ink">Teaching Experience</h2>
+        <span class="font-mono text-xs text-ink-faint">{teaching.length} courses</span>
+        <span class="flex-1 border-t border-dashed border-paper-line" aria-hidden="true"></span>
+      </header>
+      <ul class="flex flex-col gap-5">
+        {teaching.map((role) => (
+          <li>
+            <TeachingCard role={role} />
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section id="community" class="max-w-3xl mx-auto px-6 pb-24 scroll-mt-24">
+      <header class="mb-6 flex items-baseline gap-4">
+        <h2 class="font-serif text-2xl sm:text-3xl text-ink">Community</h2>
+        <span class="font-mono text-xs text-ink-faint">{community.length} roles</span>
+        <span class="flex-1 border-t border-dashed border-paper-line" aria-hidden="true"></span>
+      </header>
+      <ul class="flex flex-col gap-5">
+        {community.map((role) => (
+          <li>
+            <CommunityCard role={role} />
+          </li>
+        ))}
+      </ul>
+    </section>
+  </div>
+</Layout>

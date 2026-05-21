@@ -1,0 +1,248 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { projects, categoryColors } from '../../data/projects';
+
+export async function getStaticPaths() {
+  return projects.map((project, index) => ({
+    params: { slug: project.slug },
+    props: {
+      project,
+      prev: projects[(index - 1 + projects.length) % projects.length],
+      next: projects[(index + 1) % projects.length],
+    },
+  }));
+}
+
+const { project, prev, next } = Astro.props;
+const colors = categoryColors[project.category];
+
+const photos = project.photos ?? [];
+---
+
+<Layout
+  title={`${project.title} — Sumayya Syeda`}
+  description={project.summary}
+>
+  <article class="max-w-page mx-auto px-6 pt-12 sm:pt-16 pb-24">
+    <!-- Back link -->
+    <a
+      href="/projects"
+      class="inline-flex items-center gap-2 text-sm text-ink-muted hover:text-accent no-underline mb-10 transition-colors"
+    >
+      <span aria-hidden="true">←</span>
+      <span>All projects</span>
+    </a>
+
+    <!-- Hero -->
+    <header class="mb-12">
+      <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1 mb-4">
+        <span
+          class="font-mono text-[11px] uppercase tracking-widest px-2.5 py-0.5 rounded-full"
+          style={`background: ${colors.pastel}; color: ${colors.strong};`}
+        >
+          {project.category}
+        </span>
+        <p class="font-mono text-[11px] text-ink-faint">{project.period}</p>
+      </div>
+      <h1 class="font-serif text-4xl sm:text-5xl text-ink leading-tight mb-3">
+        {project.title}
+      </h1>
+      <p class="text-sm text-ink-muted">{project.context}</p>
+    </header>
+
+    <!-- Photos -->
+    {photos.length > 0 && (
+      <section class="mb-14" aria-label="Photos">
+        <div class={project.compactPhotos
+          ? 'grid grid-cols-1 sm:grid-cols-3 gap-4'
+          : 'grid grid-cols-1 sm:grid-cols-2 gap-4'}>
+          {photos.map((photo) => (
+            <figure
+              class={project.compactPhotos ? 'max-w-xs mx-auto w-full' : ''}
+              style={photo.widthPercent ? `max-width: ${photo.widthPercent}%; margin-left: auto; margin-right: auto;` : ''}
+            >
+              {photo.href ? (
+                <a
+                  href={photo.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="block group"
+                >
+                  <img src={photo.src} alt={photo.alt} class="rounded-lg w-full transition-transform group-hover:scale-[1.01]" />
+                </a>
+              ) : (
+                <img src={photo.src} alt={photo.alt} class="rounded-lg w-full" />
+              )}
+              {photo.caption && (
+                <figcaption class="text-xs text-ink-muted mt-2">{photo.caption}</figcaption>
+              )}
+            </figure>
+          ))}
+        </div>
+      </section>
+    )}
+
+    {project.video && (
+      <section class="mb-14" aria-label="Demo video">
+        <div class="max-w-2xl mx-auto rounded-lg overflow-hidden bg-paper-warm">
+          {project.video.youtubeId ? (
+            <div class="aspect-video">
+              <iframe
+                src={`https://www.youtube.com/embed/${project.video.youtubeId}`}
+                title={`${project.title} demo video`}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen
+                class="w-full h-full block"
+              ></iframe>
+            </div>
+          ) : project.video.src ? (
+            <video
+              src={project.video.src}
+              controls
+              preload="metadata"
+              class="w-full h-auto block"
+            ></video>
+          ) : null}
+        </div>
+        {project.video.caption && (
+          <p class="text-xs text-ink-muted mt-2 text-center">{project.video.caption}</p>
+        )}
+      </section>
+    )}
+
+    <!-- Summary + Narrative -->
+    <section class="mb-12">
+      <p class="text-lg text-ink/90 leading-relaxed mb-8">{project.summary}</p>
+      {typeof project.narrative === 'string' && (
+        <p class="text-ink/85 leading-relaxed">{project.narrative}</p>
+      )}
+      {Array.isArray(project.narrative) && project.narrative.map((section) => (
+        <div class="mb-8 last:mb-0">
+          {section.heading && (
+            <h2 class="font-serif text-xl sm:text-2xl text-ink mb-3">{section.heading}</h2>
+          )}
+          {section.paragraphs?.map((p) => (
+            <p class="text-ink/85 leading-relaxed mb-3">{p}</p>
+          ))}
+          {section.bullets && (
+            <ul class="space-y-3 mt-4">
+              {section.bullets.map((b) => (
+                <li class="flex gap-3 text-ink/85 leading-relaxed">
+                  <span
+                    class="mt-2 shrink-0 w-1.5 h-1.5 rounded-full"
+                    style={`background: ${colors.strong};`}
+                    aria-hidden="true"
+                  ></span>
+                  <span>
+                    {b.name && <strong class="text-ink font-semibold">{b.name}</strong>}{b.name && ' — '}{b.text}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      ))}
+    </section>
+
+    <!-- Details list -->
+    <section
+      class="mb-12 rounded-xl border-l-4 p-6 sm:p-8"
+      style={`border-left-color: ${colors.strong}; background: ${colors.pastel}33;`}
+    >
+      <div class="flex items-center gap-3 mb-5">
+        <span
+          class="font-mono text-[10px] uppercase tracking-widest px-2 py-0.5 rounded"
+          style={`background: ${colors.pastel}; color: ${colors.strong};`}
+        >
+          My role
+        </span>
+        <span class="flex-1 border-t border-dashed" style={`border-color: ${colors.strong}33;`} aria-hidden="true"></span>
+      </div>
+      <h2
+        class="font-serif text-2xl sm:text-3xl mb-5 leading-tight"
+        style={`color: ${colors.strong};`}
+      >
+        What I did
+      </h2>
+      <ul class="space-y-3">
+        {project.details.map((d) => (
+          <li class="flex gap-3 text-ink/90 leading-relaxed">
+            <span
+              class="mt-2 shrink-0 w-1.5 h-1.5 rounded-full"
+              style={`background: ${colors.strong};`}
+              aria-hidden="true"
+            ></span>
+            <span>{d}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <!-- Tech stack -->
+    <section class="mb-12">
+      <h2 class="font-mono text-xs uppercase tracking-widest text-ink-faint mb-4">
+        Tech
+      </h2>
+      <ul class="flex flex-wrap gap-1.5">
+        {project.tags.map((tag) => (
+          <li
+            class="font-mono text-[10px] uppercase tracking-wider px-2 py-0.5 rounded"
+            style={`background: ${colors.pastel}; color: ${colors.strong};`}
+          >
+            {tag}
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <!-- Artifacts -->
+    {project.artifacts && project.artifacts.length > 0 && (
+      <section class="mb-14">
+        <h2 class="font-mono text-xs uppercase tracking-widest text-ink-faint mb-4">
+          Artifacts
+          <span class="text-ink-faint normal-case tracking-normal ml-2">(placeholders)</span>
+        </h2>
+        <ul class="space-y-1">
+          {project.artifacts.map((a) => (
+            <li>
+              <a
+                href={a.href}
+                class="group flex items-center gap-3 py-2 text-ink hover:text-accent no-underline transition-colors"
+              >
+                <span class="font-mono text-[10px] uppercase tracking-widest text-ink-faint w-28">
+                  {a.kindLabel ?? a.kind ?? 'link'}
+                </span>
+                <span class="border-b border-paper-line group-hover:border-accent transition-colors">
+                  {a.label}
+                </span>
+                <span aria-hidden="true" class="text-ink-faint group-hover:text-accent transition-colors">→</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    <!-- Prev / Next -->
+    <nav class="border-t border-paper-line pt-8 flex flex-col sm:flex-row gap-4 justify-between text-sm">
+      <a
+        href={`/projects/${prev.slug}`}
+        class="group no-underline text-ink-muted hover:text-accent transition-colors"
+      >
+        <span class="font-mono text-[10px] uppercase tracking-widest block mb-1">← Previous</span>
+        <span class="font-serif text-base text-ink group-hover:text-accent transition-colors">
+          {prev.title}
+        </span>
+      </a>
+      <a
+        href={`/projects/${next.slug}`}
+        class="group no-underline text-ink-muted hover:text-accent transition-colors text-right"
+      >
+        <span class="font-mono text-[10px] uppercase tracking-widest block mb-1">Next →</span>
+        <span class="font-serif text-base text-ink group-hover:text-accent transition-colors">
+          {next.title}
+        </span>
+      </a>
+    </nav>
+  </article>
+</Layout>

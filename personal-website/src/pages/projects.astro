@@ -1,0 +1,101 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import FeaturedProjectCard from '../components/FeaturedProjectCard.astro';
+import PageOutline from '../components/PageOutline.astro';
+import { projects, categoryColors, type Category } from '../data/projects';
+
+const categoryOrder: Category[] = ['Robotics', 'Systems'];
+const grouped = categoryOrder.map((cat) => ({
+  category: cat,
+  items: projects.filter((p) => p.category === cat),
+}));
+
+const featured = projects.filter((p) => p.featured);
+
+const outlineItems = [
+  ...(featured.length > 0 ? [{ id: 'featured', label: 'Featured' }] : []),
+  ...grouped.map(({ category }) => ({
+    id: category.toLowerCase(),
+    label: category,
+  })),
+];
+---
+
+<Layout
+  title="Projects — Sumayya Syeda"
+  description="A collection of college projects spanning robotics and systems."
+>
+  <PageOutline items={outlineItems} />
+
+  <div class="lg:pl-20 lg:pr-56 xl:pl-28 xl:pr-60">
+    <section class="max-w-page mx-auto px-6 pt-16 sm:pt-20 pb-10">
+      <p class="font-mono text-xs uppercase tracking-widest text-ink-faint mb-3">
+        Projects
+      </p>
+      <h1 class="font-serif text-4xl sm:text-5xl text-ink mb-5 leading-tight">
+        Things I've built
+      </h1>
+      <p class="text-lg text-ink/90 leading-relaxed max-w-prose">
+        Coursework, capstones, and labs from CMU — across robotics and systems.
+        Click any card for the full write-up, photos, and artifacts.
+      </p>
+    </section>
+
+    {featured.length > 0 && (
+      <section
+        id="featured"
+        class="max-w-page mx-auto px-6 pt-4 pb-16 scroll-mt-24"
+      >
+        <header class="mb-6 flex items-baseline gap-4">
+          <h2 class="font-serif text-2xl sm:text-3xl text-ink">Featured</h2>
+          <span class="font-mono text-xs text-ink-faint">capstones</span>
+          <span
+            class="flex-1 border-t border-dashed border-paper-line"
+            aria-hidden="true"
+          ></span>
+        </header>
+        <ul class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {featured.map((project) => (
+            <li class="h-full">
+              <FeaturedProjectCard project={project} />
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    <section class="max-w-page mx-auto px-6 pb-24 space-y-16">
+      {grouped.map(({ category, items }) => {
+        const colors = categoryColors[category];
+        return (
+          <div id={category.toLowerCase()} class="scroll-mt-24">
+            <header class="mb-6 flex items-baseline gap-4">
+              <h2
+                class="font-serif text-2xl sm:text-3xl"
+                style={`color: ${colors.strong};`}
+              >
+                {category}
+              </h2>
+              <span class="font-mono text-xs text-ink-faint">
+                {items.length} {items.length === 1 ? 'project' : 'projects'}
+              </span>
+              <span
+                class="flex-1 border-t border-dashed"
+                style={`border-color: ${colors.pastel};`}
+                aria-hidden="true"
+              ></span>
+            </header>
+            <ul class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {items.map((project) => (
+                <li class="h-full">
+                  <ProjectCard project={project} />
+                </li>
+              ))}
+            </ul>
+          </div>
+        );
+      })}
+    </section>
+  </div>
+</Layout>

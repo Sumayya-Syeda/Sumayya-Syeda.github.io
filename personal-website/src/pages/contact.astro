@@ -1,0 +1,57 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const contacts = [
+  {
+    label: 'Email',
+    value: 'sumayya.syeda@gmail.com',
+    href: 'mailto:sumayya.syeda@gmail.com',
+  },
+  {
+    label: 'LinkedIn',
+    value: 'linkedin.com/in/sums',
+    href: 'https://linkedin.com/in/sums',
+  },
+  {
+    label: 'GitHub',
+    value: 'github.com/Sumayya-Syeda',
+    href: 'https://github.com/Sumayya-Syeda',
+  },
+];
+---
+
+<Layout
+  title="Contact — Sumayya Syeda"
+  description="How to reach Sumayya Syeda."
+>
+  <section class="max-w-page mx-auto px-6 pt-16 sm:pt-20 pb-24">
+    <p class="font-mono text-xs uppercase tracking-widest text-ink-faint mb-3">
+      Contact
+    </p>
+    <h1 class="font-serif text-4xl sm:text-5xl text-ink mb-5 leading-tight">
+      Get in touch
+    </h1>
+    <p class="text-lg text-ink/90 leading-relaxed max-w-prose mb-12">
+      The best ways to reach me. I'm open to chats about systems engineering,
+      streaming media, robotics, and how to break into hardware-adjacent software.
+    </p>
+
+    <ul class="space-y-1 max-w-prose">
+      {contacts.map((c) => (
+        <li class="reveal">
+          <a
+            href={c.href}
+            class="group flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-6 py-5 border-b border-paper-line no-underline hover:bg-paper-warm/40 -mx-3 px-3 rounded transition-colors"
+          >
+            <span class="font-mono text-xs uppercase tracking-widest text-ink-faint sm:w-24 sm:shrink-0">
+              {c.label}
+            </span>
+            <span class="block text-ink group-hover:text-accent transition-colors text-base flex-1">
+              {c.value}
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+</Layout>

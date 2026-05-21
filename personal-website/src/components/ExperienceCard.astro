@@ -1,0 +1,63 @@
+---
+import type { RoadmapStop } from '../data/roadmap';
+import Icon from './Icon.astro';
+
+interface Props {
+  stop: RoadmapStop;
+  isLatest: boolean;
+}
+
+const { stop, isLatest } = Astro.props;
+---
+
+<a
+  href={`/experience/${stop.slug}`}
+  class="group rounded-xl border-l-4 border-y border-r border-paper-line p-6 hover:shadow-md hover:-translate-y-0.5 transition-all reveal h-full flex flex-col no-underline text-ink"
+  style={`border-left-color: ${stop.pastelStrong}; background: linear-gradient(135deg, ${stop.pastel}55 0%, transparent 55%);`}
+>
+  <header class="flex items-start gap-4 mb-3">
+    <div
+      class="shrink-0 w-11 h-11 rounded-lg flex items-center justify-center"
+      style={`background: ${stop.pastel}; color: ${stop.pastelStrong};`}
+      aria-hidden="true"
+    >
+      <Icon name={stop.icon} size={22} />
+    </div>
+    <div class="flex-1 min-w-0">
+      <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 mb-1">
+        <span
+          class="font-mono text-[10px] uppercase tracking-widest"
+          style={`color: ${stop.pastelStrong};`}
+        >
+          {isLatest ? 'Currently' : stop.region}
+        </span>
+        <span class="font-mono text-[11px] text-ink-faint whitespace-nowrap">
+          {stop.period}
+        </span>
+      </div>
+      <h3 class="font-serif text-xl text-ink leading-snug group-hover:text-accent transition-colors">
+        {stop.company}
+      </h3>
+      <p class="text-xs text-ink-muted mt-0.5">{stop.role}</p>
+    </div>
+  </header>
+
+  <p class="text-sm text-ink/90 leading-relaxed mb-4">{stop.blurb}</p>
+
+  <ul class="mt-auto flex flex-wrap gap-1.5 mb-3">
+    {stop.tags.slice(0, 5).map((tag) => (
+      <li
+        class="font-mono text-[10px] uppercase tracking-wider text-ink-muted bg-paper-warm px-2 py-0.5 rounded"
+      >
+        {tag}
+      </li>
+    ))}
+  </ul>
+
+  <span
+    class="font-mono text-[11px] uppercase tracking-widest inline-flex items-center gap-1 transition-transform group-hover:translate-x-0.5"
+    style={`color: ${stop.pastelStrong};`}
+  >
+    Read more <span aria-hidden="true">→</span>
+  </span>
+</a>

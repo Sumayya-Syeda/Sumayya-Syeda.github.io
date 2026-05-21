@@ -1,0 +1,261 @@
+---
+import type { RoadmapStop, RegionInfo } from '../data/roadmap';
+
+interface Props {
+  stops: RoadmapStop[];
+  regions: RegionInfo[];
+}
+
+const { stops, regions } = Astro.props;
+
+// Per-segment arc config. With 4 stops, we have 3 segments:
+//   1) CMU → Joby      (cross-country, arc up high)
+//   2) Joby → Walmart  (short hop within the Bay, gentle curve)
+//   3) Walmart → Apple (drop south, arc east a touch)
+const arcConfigs: Array<{ axis: 'x' | 'y'; offset: number }> = [
+  { axis: 'y', offset: -120 },
+  { axis: 'y', offset: 50 },
+  { axis: 'x', offset: 130 },
+];
+
+const buildPath = () => {
+  if (stops.length === 0) return '';
+  let d = `M ${stops[0].coords.x} ${stops[0].coords.y}`;
+  for (let i = 0; i < stops.length - 1; i++) {
+    const p1 = stops[i].coords;
+    const p2 = stops[i + 1].coords;
+    const cfg = arcConfigs[i] ?? { axis: 'y', offset: -120 };
+    const midX = (p1.x + p2.x) / 2 + (cfg.axis === 'x' ? cfg.offset : 0);
+    const midY = (p1.y + p2.y) / 2 + (cfg.axis === 'y' ? cfg.offset : 0);
+    d += ` Q ${midX} ${midY}, ${p2.x} ${p2.y}`;
+  }
+  return d;
+};
+
+const roadPath = buildPath();
+---
+
+<div class="relative w-full">
+  <svg
+    viewBox="0 0 1200 720"
+    preserveAspectRatio="xMidYMid meet"
+    class="w-full h-auto block"
+    role="img"
+    aria-label="Map of career stops across Pittsburgh, San Carlos, Sunnyvale, and San Diego"
+  >
+    <defs>
+      <linearGradient id="roadGradient" x1="0" x2="1" y1="0" y2="0">
+        {stops.map((s, i) => (
+          <stop
+            offset={`${(i / (stops.length - 1)) * 100}%`}
+            stop-color={s.pastel}
+          />
+        ))}
+      </linearGradient>
+    </defs>
+
+    <!-- Region blobs -->
+    {regions.map((r) => (
+      <g>
+        <ellipse
+          cx={r.center.x}
+          cy={r.center.y}
+          rx={r.radius.rx}
+          ry={r.radius.ry}
+          fill={r.tint}
+          fill-opacity="0.45"
+          stroke={r.tintStrong}
+          stroke-width="1.4"
+          stroke-dasharray="3 6"
+        />
+        <text
+          x={r.center.x}
+          y={r.center.y - r.radius.ry - 14}
+          text-anchor="middle"
+          style={`font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 16px; letter-spacing: 0.24em; fill: ${r.tintStrong}; text-transform: uppercase; font-weight: 600;`}
+        >
+          {r.label}
+        </text>
+      </g>
+    ))}
+
+
+    <!-- Road shadow / shoulder -->
+    <path
+      d={roadPath}
+      fill="none"
+      stroke="#e6e3da"
+      stroke-width="32"
+      stroke-linecap="round"
+      opacity="0.55"
+    />
+    <!-- Road body -->
+    <path
+      d={roadPath}
+      fill="none"
+      stroke="url(#roadGradient)"
+      stroke-width="22"
+      stroke-linecap="round"
+    />
+    <!-- Center stripe -->
+    <path
+      d={roadPath}
+      fill="none"
+      stroke="#5a5a5a"
+      stroke-width="1.6"
+      stroke-dasharray="14 18"
+      stroke-linecap="round"
+      opacity="0.4"
+    />
+
+    <!-- Markers — each pin links to its experience detail page -->
+    {stops.map((stop, i) => {
+      const isLatest = i === stops.length - 1;
+      return (
+        <a
+          href={`/experience/${stop.slug}`}
+          class="roadmap-marker"
+          aria-label={`Read about ${stop.company}`}
+          style={`--pastel: ${stop.pastel}; --pastel-strong: ${stop.pastelStrong};`}
+        >
+        <g
+          transform={`translate(${stop.coords.x}, ${stop.coords.y})`}
+        >
+          {isLatest && (
+            <circle
+              r="30"
+              fill="none"
+              stroke="var(--pastel-strong)"
+              stroke-width="1.5"
+              opacity="0.45"
+              class="marker-pulse"
+            />
+          )}
+          <!-- Hit area -->
+          <circle r="42" fill="transparent" />
+          <!-- Pin shadow -->
+          <ellipse cx="0" cy="26" rx="16" ry="3" fill="#1a1a1a" opacity="0.14" />
+
+          <!-- Outer ring -->
+          <circle
+            class="marker-ring"
+            r="20"
+            fill="var(--pastel)"
+            stroke="var(--pastel-strong)"
+            stroke-width="2.5"
+          />
+
+          <!-- Inner dot with company icon -->
+          <circle class="marker-dot" r="14" fill="var(--pastel-strong)" />
+          <g
+            transform="translate(-9 -9) scale(0.75)"
+            stroke="#fff"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            fill="none"
+          >
+            {stop.icon === 'scotty' && (
+              <g>
+                <path d="M3 16.5h18v2.5a1 1 0 0 1-1 1h-1.5l-.5 1h-1l-.5-1H8.5l-.5 1H7l-.5-1H4a1 1 0 0 1-1-1z" fill="#fff" stroke="none" />
+                <path d="M3 16.5V13a4 4 0 0 1 4-4h2.5c.3-1.4 1.4-2.5 2.5-2.5 1 0 1.5.7 1.5 1.5" fill="#fff" stroke="none" />
+                <circle cx="6.5" cy="12" r="0.9" fill="var(--pastel-strong)" stroke="none" />
+              </g>
+            )}
+            {stop.icon === 'plane' && (
+              <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z" />
+            )}
+            {stop.icon === 'spark' && (
+              <g>
+                <circle cx="12" cy="12" r="1.4" fill="#fff" stroke="none" />
+                <line x1="12" y1="2.5" x2="12" y2="7.5" />
+                <line x1="12" y1="16.5" x2="12" y2="21.5" />
+                <line x1="20.4" y1="7.2" x2="16.1" y2="9.7" />
+                <line x1="7.9" y1="14.3" x2="3.6" y2="16.8" />
+                <line x1="20.4" y1="16.8" x2="16.1" y2="14.3" />
+                <line x1="7.9" y1="9.7" x2="3.6" y2="7.2" />
+              </g>
+            )}
+            {stop.icon === 'apple-logo' && (
+              <g fill="#fff" stroke="none">
+                <path d="M17.6 13.5c0-2.4 1.9-3.5 2-3.6-1.1-1.6-2.8-1.8-3.4-1.8-1.4-.1-2.8.9-3.5.9s-1.8-.8-3-.8c-1.6 0-3 .9-3.8 2.3-1.6 2.8-.4 7 1.2 9.3.8 1.1 1.7 2.4 2.9 2.3 1.2 0 1.6-.7 3-.7s1.8.7 3 .7c1.3 0 2-1.1 2.8-2.2.9-1.3 1.2-2.5 1.3-2.6-.1 0-2.5-.9-2.5-3.8z" />
+                <path d="M14.7 5.5c.6-.7 1.1-1.7 1-2.7-.9 0-1.9.6-2.6 1.3-.6.6-1.1 1.6-1 2.6 1 .1 2-.5 2.6-1.2z" />
+              </g>
+            )}
+          </g>
+
+          {isLatest && (
+            <text
+              y="-32"
+              text-anchor="middle"
+              style={`font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 9.5px; letter-spacing: 0.22em; text-transform: uppercase; fill: ${stop.pastelStrong}; font-weight: 700;`}
+            >
+              Currently
+            </text>
+          )}
+
+          <!-- Company name — sits inside the dotted cluster, just below the marker -->
+          <text
+            y="42"
+            text-anchor="middle"
+            style="font-family: 'Source Serif 4', Georgia, serif; font-size: 16px; font-weight: 600; fill: #1a1a1a;"
+          >
+            {stop.shortName}
+          </text>
+          <!-- Period — also inside the cluster -->
+          <text
+            y="60"
+            text-anchor="middle"
+            style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11.5px; fill: #5a5a5a; letter-spacing: 0.06em;"
+          >
+            {stop.period}
+          </text>
+        </g>
+        </a>
+      );
+    })}
+  </svg>
+</div>
+
+<style>
+  .roadmap-marker {
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .roadmap-marker:focus {
+    outline: none;
+  }
+  .roadmap-marker:hover .marker-ring,
+  .roadmap-marker:focus-visible .marker-ring {
+    stroke-width: 3.5;
+  }
+  .roadmap-marker:hover .marker-dot,
+  .roadmap-marker:focus-visible .marker-dot {
+    r: 16;
+  }
+
+  @keyframes pulse {
+    0% {
+      opacity: 0.55;
+      transform: scale(0.92);
+    }
+    50% {
+      opacity: 0.18;
+      transform: scale(1.18);
+    }
+    100% {
+      opacity: 0.55;
+      transform: scale(0.92);
+    }
+  }
+  .marker-pulse {
+    animation: pulse 2.6s ease-in-out infinite;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .marker-pulse {
+      animation: none;
+    }
+  }
+</style>

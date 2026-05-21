@@ -1,0 +1,101 @@
+---
+import Layout from '../layouts/Layout.astro';
+import WindingRoad from '../components/WindingRoad.astro';
+import { roadmap, regions } from '../data/roadmap';
+---
+
+<Layout
+  title="Sumayya Syeda — Systems Engineer"
+  description="Sumayya Syeda — systems and performance engineer at Apple, working on streaming media internals."
+>
+  <!-- Hero / About -->
+  <section class="max-w-page mx-auto px-6 pt-16 sm:pt-24 pb-12 sm:pb-16">
+    <div class="flex flex-col sm:flex-row gap-6 sm:gap-10 items-start">
+      <div
+        class="w-24 h-24 sm:w-28 sm:h-28 shrink-0 rounded-full bg-paper-warm border border-paper-line flex items-center justify-center text-ink-faint font-mono text-xs"
+        aria-label="Profile photo placeholder"
+      >
+        photo
+      </div>
+
+      <div class="max-w-prose">
+        <p class="font-mono text-xs uppercase tracking-widest text-ink-faint mb-2">
+          Systems Engineer · Apple
+        </p>
+        <h1 class="font-serif text-4xl sm:text-5xl leading-tight text-ink mb-4">
+          Sumayya Syeda
+        </h1>
+        <p class="text-lg text-ink/90 leading-relaxed mb-5">
+          [Placeholder] CMU '24, ECE + Robotics. I build low-level systems software —
+          currently on Apple's streaming media team in San Diego.
+        </p>
+
+        <ul class="flex flex-wrap gap-2 text-sm">
+          <li>
+            <a
+              href="#"
+              class="no-underline font-mono text-[11px] uppercase tracking-widest px-3 py-1 rounded-full inline-flex items-center gap-1 transition-transform hover:-translate-y-0.5"
+              style="background: #f7d9c4; color: #d6885a;"
+            >
+              Photography <span aria-hidden="true">↗</span>
+            </a>
+          </li>
+          <li>
+            <span
+              class="font-mono text-[11px] uppercase tracking-widest px-3 py-1 rounded-full inline-block"
+              style="background: #d6e8cf; color: #6ba36b;"
+            >
+              Hiking
+            </span>
+          </li>
+          <li>
+            <span
+              class="font-mono text-[11px] uppercase tracking-widest px-3 py-1 rounded-full inline-block"
+              style="background: #f4e7c2; color: #c9a44e;"
+            >
+              Cafes
+            </span>
+          </li>
+          <li>
+            <span
+              class="font-mono text-[11px] uppercase tracking-widest px-3 py-1 rounded-full inline-block"
+              style="background: #cfe6f3; color: #5a9ec4;"
+            >
+              Ocean &amp; sky
+            </span>
+          </li>
+          <li>
+            <span
+              class="font-mono text-[11px] uppercase tracking-widest px-3 py-1 rounded-full inline-block"
+              style="background: #e6dcf2; color: #9c83c8;"
+            >
+              Travel
+            </span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Roadmap -->
+  <section id="roadmap" class="max-w-page mx-auto px-6 pb-24">
+    <header class="mb-6 sm:mb-8 reveal flex flex-wrap items-baseline justify-between gap-4">
+      <div>
+        <p class="font-mono text-xs uppercase tracking-widest text-ink-faint mb-2">
+          The road so far
+        </p>
+        <h2 class="font-serif text-2xl sm:text-3xl text-ink leading-tight">
+          A map of where I've been
+        </h2>
+      </div>
+      <p class="text-sm text-ink-muted max-w-xs">
+        Pins sit at each location, in chronological order along the road.
+        <span class="text-ink-faint">Click any pin to read the full story →</span>
+      </p>
+    </header>
+
+    <div class="reveal">
+      <WindingRoad stops={roadmap} regions={regions} />
+    </div>
+  </section>
+</Layout>

@@ -1,0 +1,112 @@
+---
+import type { CommunityRole } from '../data/community';
+import Icon from './Icon.astro';
+
+interface Props {
+  role: CommunityRole;
+}
+
+const { role } = Astro.props;
+---
+
+<article
+  class="rounded-xl border-l-4 border-y border-r border-paper-line p-6 reveal"
+  style={`border-left-color: ${role.pastelStrong}; background: linear-gradient(135deg, ${role.pastel}55 0%, transparent 55%);`}
+>
+  <header class="flex items-start gap-4 mb-3">
+    {role.logo && role.logoFill ? (
+      <div class="shrink-0 w-12 h-12 rounded-lg overflow-hidden">
+        <img
+          src={role.logo}
+          alt={`${role.org} logo`}
+          class="w-full h-full object-cover"
+        />
+      </div>
+    ) : role.logo ? (
+      <div
+        class="shrink-0 w-12 h-12 rounded-lg border flex items-center justify-center p-1.5"
+        style={`background: ${role.logoBg ?? '#ffffff'}; border-color: ${role.logoBg ?? '#e6e3da'};`}
+      >
+        <img
+          src={role.logo}
+          alt={`${role.org} logo`}
+          class="max-w-full max-h-full object-contain"
+        />
+      </div>
+    ) : (
+      <div
+        class="shrink-0 w-11 h-11 rounded-lg flex items-center justify-center"
+        style={`background: ${role.pastel}; color: ${role.pastelStrong};`}
+        aria-hidden="true"
+      >
+        <Icon name={role.icon} size={22} />
+      </div>
+    )}
+    <div class="flex-1 min-w-0">
+      <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 mb-1">
+        <span
+          class="font-mono text-[10px] uppercase tracking-widest"
+          style={`color: ${role.pastelStrong};`}
+        >
+          {role.current ? 'Currently' : role.location}
+        </span>
+        <span class="font-mono text-[11px] text-ink-faint whitespace-nowrap">
+          {role.period}
+        </span>
+      </div>
+      <h3 class="font-serif text-xl text-ink leading-snug">
+        {role.org}
+      </h3>
+      <p
+        class="text-sm font-semibold mt-1"
+        style={`color: ${role.pastelStrong};`}
+      >
+        {role.role}
+      </p>
+    </div>
+  </header>
+
+  <p class="text-sm text-ink/90 leading-relaxed mb-4">{role.blurb}</p>
+
+  {role.highlights.length > 0 && (
+    <ul class="space-y-2 mb-4">
+      {role.highlights.map((h) => (
+        <li class="flex gap-3 text-sm text-ink/85 leading-relaxed">
+          <span
+            class="mt-1.5 shrink-0 w-1.5 h-1.5 rounded-full"
+            style={`background: ${role.pastelStrong};`}
+            aria-hidden="true"
+          ></span>
+          <span>{h}</span>
+        </li>
+      ))}
+    </ul>
+  )}
+
+  <ul class="flex flex-wrap gap-1.5 mb-4">
+    {role.tags.map((tag) => (
+      <li
+        class="font-mono text-[10px] uppercase tracking-wider text-ink-muted bg-paper-warm px-2 py-0.5 rounded"
+      >
+        {tag}
+      </li>
+    ))}
+  </ul>
+
+  {role.links && role.links.length > 0 && (
+    <div class="flex flex-wrap gap-x-5 gap-y-2 border-t border-paper-line pt-4">
+      {role.links.map((link) => (
+        <a
+          href={link.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="font-mono text-xs no-underline inline-flex items-center gap-1.5 transition-transform hover:translate-x-0.5"
+          style={`color: ${role.pastelStrong};`}
+        >
+          <Icon name={link.kind === 'instagram' ? 'instagram' : 'globe'} size={15} />
+          <span>{link.label}</span>
+        </a>
+      ))}
+    </div>
+  )}
+</article>
