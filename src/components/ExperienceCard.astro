@@ -1,6 +1,7 @@
 ---
 import type { RoadmapStop } from '../data/roadmap';
 import Icon from './Icon.astro';
+import { withBase } from '../lib/path';
 
 interface Props {
   stop: RoadmapStop;
@@ -11,7 +12,7 @@ const { stop, isLatest } = Astro.props;
 ---
 
 <a
-  href={`/experience/${stop.slug}`}
+  href={withBase(`/experience/${stop.slug}`)}
   class="group rounded-xl border-l-4 border-y border-r border-paper-line p-6 hover:shadow-md hover:-translate-y-0.5 transition-all reveal h-full flex flex-col no-underline text-ink"
   style={`border-left-color: ${stop.pastelStrong}; background: linear-gradient(135deg, ${stop.pastel}55 0%, transparent 55%);`}
 >

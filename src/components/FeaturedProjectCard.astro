@@ -1,5 +1,6 @@
 ---
 import { categoryColors, type Project } from '../data/projects';
+import { withBase } from '../lib/path';
 
 interface Props {
   project: Project;
@@ -11,13 +12,13 @@ const heroPhoto = project.photos?.[0];
 ---
 
 <a
-  href={`/projects/${project.slug}`}
+  href={withBase(`/projects/${project.slug}`)}
   class="group block rounded-xl overflow-hidden border border-paper-line hover:shadow-md hover:-translate-y-0.5 transition-all reveal no-underline text-ink"
 >
   {heroPhoto ? (
     <div class="aspect-[16/10] max-w-sm mx-auto overflow-hidden bg-paper-warm">
       <img
-        src={heroPhoto.src}
+        src={withBase(heroPhoto.src)}
         alt={heroPhoto.alt}
         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
         loading="lazy"

@@ -3,6 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import Icon from '../../components/Icon.astro';
 import { roadmap, type RoadmapStop } from '../../data/roadmap';
 import type { Narrative } from '../../data/narrative';
+import { withBase } from '../../lib/path';
 
 interface UnifiedItem {
   slug: string;
@@ -70,7 +71,7 @@ const photos = item.photos ?? [];
 >
   <article class="max-w-page mx-auto px-6 pt-12 sm:pt-16 pb-24">
     <a
-      href="/experience"
+      href={withBase('/experience')}
       class="inline-flex items-center gap-2 text-sm text-ink-muted hover:text-accent no-underline mb-10 transition-colors"
     >
       <span aria-hidden="true">←</span>
@@ -132,7 +133,7 @@ const photos = item.photos ?? [];
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {photos.map((photo) => (
             <figure>
-              <img src={photo.src} alt={photo.alt} class="rounded-lg w-full" />
+              <img src={withBase(photo.src)} alt={photo.alt} class="rounded-lg w-full" />
               {photo.caption && (
                 <figcaption class="text-xs text-ink-muted mt-2">{photo.caption}</figcaption>
               )}
@@ -201,7 +202,7 @@ const photos = item.photos ?? [];
           {item.artifacts.map((a) => (
             <li>
               <a
-                href={a.href}
+                href={withBase(a.href)}
                 class="group flex items-center gap-3 py-2 text-ink hover:text-accent no-underline transition-colors"
               >
                 <span class="font-mono text-[10px] uppercase tracking-widest text-ink-faint w-12">
@@ -220,7 +221,7 @@ const photos = item.photos ?? [];
 
     <nav class="border-t border-paper-line pt-8 flex flex-col sm:flex-row gap-4 justify-between text-sm">
       <a
-        href={`/experience/${prev.slug}`}
+        href={withBase(`/experience/${prev.slug}`)}
         class="group no-underline text-ink-muted hover:text-accent transition-colors"
       >
         <span class="font-mono text-[10px] uppercase tracking-widest block mb-1">← Previous</span>
@@ -229,7 +230,7 @@ const photos = item.photos ?? [];
         </span>
       </a>
       <a
-        href={`/experience/${next.slug}`}
+        href={withBase(`/experience/${next.slug}`)}
         class="group no-underline text-ink-muted hover:text-accent transition-colors text-right"
       >
         <span class="font-mono text-[10px] uppercase tracking-widest block mb-1">Next →</span>
